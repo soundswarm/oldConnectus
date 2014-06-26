@@ -106,19 +106,21 @@ this app:
                 });
               };
 
-              function getCollaborators(repos, user, callback) {
-                for(var i=0;i<repos.length,i++) {
+              function getCollaborators(callback) {
+                for(var i=0;i<repos.length;i++) {
                   $.ajax({
-                  url: apiUrl+'/repos/'+user+repos[i],
-                  type: 'GET',
-                  success: function(result) {
-                    callback(result);
-                  }
-                });                
-              }
+                    url: apiUrl+'/repos/'+user+repos[i],
+                    type: 'GET',
+                    success: function(result) {
+                      callback(result);
+                    } 
+                  });
+                };               
+              };
 
               //add collaborator to repo(s) function
               function addCollaborator(userAdded, repo) {
+                
                 $.get(userUrl, function(user) {
                   var addUserUrl = apiUrl+'/repos/'+user.login+'/'+repo+'/collaborators/'+userAdded+tokenUrl;
                   $.ajax({
@@ -152,7 +154,6 @@ this app:
               }); 
             });
           };
-        //});
       }); 
     </script>
     
