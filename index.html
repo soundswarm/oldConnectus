@@ -63,12 +63,12 @@ this app:
                   url: authRepoUrl,
                   type: 'GET',
                   data: {'sort': 'updated'},
-                  success: function(repos) {
-                    console.log(repos);
-                    callback(repos);
+                  success: function(response) {
+                    console.log(response);
+                    callback(response);
                   }
                 });
-              }
+              };
 
               function displayRepos(repos) {
                 reposHtml ="";
@@ -106,7 +106,7 @@ this app:
                 });
               };
 
-              function getCollaborators(callback) {
+              function getCollaborators(repos, user, callback) {
                 for(var i=0;i<repos.length;i++) {
                   $.ajax({
                     url: apiUrl+'/repos/'+user+repos[i],
