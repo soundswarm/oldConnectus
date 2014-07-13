@@ -1,62 +1,86 @@
 $(document).ready( function () {
+
   //$('#createRepo, #addUser, #listRepos').hide();
   //oauth.io authentication
   OAuth.initialize('vMLd_AIdnpZtRPRH61n9z4j8RS8', {cache: true});
 
   if(OAuth.create('github')) {
-    $('.signIn').hide();
-    $('#createRepo, #addUser, #listRepos').fadeIn();
-    doEverything();
-  } else {
-    $('.signIn').fadeIn();
-    $('#createRepo, #addUser, #listRepos').hide();
-    $('.signIn').on('click', doEverything );
+    console.log(OAuth.create('github'));
+      $('.signIn').hide();
+      $('#createRepo, #addUser, #listRepos').fadeIn();
+      doEverything();
+    } else {
+      console.log(OAuth.create('github'));
+      $('.signIn').fadeIn();
+      $('#createRepo, #addUser, #listRepos').hide();
+      $('.signIn').on('click', doEverything );
   }
-          
+  
   function doEverything() {
     OAuth.popup('github', {cache: true}, function(error, result) {
       //handle error with error
       //use result.access_token in your API request
-      $('.signIn').hide();
-      $('#createRepo, #addUser, #listRepos').fadeIn();
+    $('.signIn').hide();
+    $('#createRepo, #addUser, #listRepos').fadeIn();
 
       //urls used in API calls
       var apiUrl = "https://api.github.com";
       var tokenUrl ='?access_token='+result.access_token;
       var userUrl = apiUrl+'/user'+tokenUrl;
-      var authRepoUrl = apiUrl+'/user/repos'+tokenUrl
-              
+      var authRepoUrl = apiUrl+'/user/repos'+tokenUrl;
+      var usersUrl = apiUrl+'/search/users';
+      
       //display a string on the page
       function display(object) {
         $('.repos').hide().html(object).fadeIn();
+      }; 
+      function countLang(repos) {
+
       };
 
+      function getLang(repos) {
+        for(var i=0;i<repos.length;i++) {
+          $.ajax({
+            url: repos[i].languages_url+tokenUrl,
+            type: 'GET',
+            success: function(response) {
+              console.log(response);
+              //callback(response);
+            }
+          });
+        };
+      };
+
+      getRepo(getLang);
+
       //get authenticated repos
-      function getRepos(callback) {
+      function getRepo(callback) {
         $.ajax({
           url: authRepoUrl,
           type: 'GET',
           data: {'sort': 'updated'},
-          success: function(repos) {
-            console.log(repos);
-            callback(repos);
+          success: function(result) {
+            console.log(result);
+            callback(result);
           }
         });
-      }
-
-      function displayRepos(repos) {
-        reposHtml ="";
-        for(var i=0; i<repos.length; i++) {
-          reposHtml+= '<div class="list-group-item"> <a href='+repos[i].html_url+' class="btn btn-primary">'+repos[i].name+ '</a> <label class="btn btn-primary"> <input type="checkbox" id='+ repos[i].name+'> Add collaborator </label></div>';
-        }
-        $('.repos').hide().html(reposHtml).fadeIn();
       };
 
-      getRepos(displayRepos);
+      //make repos' into html buttons and display them
+      function repoButtons(repos) {
+        var buttons="";
+        for (var i=0; i < repos.length; i++) {
+          //format the repos into buttons/links and checkboxes
+          buttons+= '<div class="list-group-item"> <a href='+repos[i].html_url+' class="btn btn-primary">'+repos[i].name+ '</a> <label class="btn btn-primary"> <input type="checkbox" id='+ repos[i].name+'> Add collaborator </label></div>';
+        };
+        display(buttons);
+      };
+
+      getRepo(repoButtons);
 
       //when create button is clicked, create a new repo and display it
       $(".create").on('click', function() {
-        event.preventDefault();
+        event.preventDefault();            
         $.ajax(authRepoUrl, {
           type: 'POST',
           data: JSON.stringify({
@@ -68,30 +92,7 @@ $(document).ready( function () {
           }
         });
       });
-
-      //get user that's authenticated/logged in
-      function getAuthUser(callback) {
-        $.ajax({
-          url: userUrl,
-          type: 'GET',
-          success: function(result) {
-            callback(result);
-          }
-        });
-      };
-
-      function getCollaborators(callback) {
-        for(var i=0;i<repos.length;i++) {
-          $.ajax({
-            url: apiUrl+'/repos/'+user+repos[i],
-            type: 'GET',
-            success: function(result) {
-              callback(result);
-            }
-          });
-        };
-      };
-
+ 
       //add collaborator to repo(s) function
       function addCollaborator(userAdded, repo) {
         $.get(userUrl, function(user) {
@@ -116,15 +117,29 @@ $(document).ready( function () {
         var repos = $("input[type=checkbox]:checked");
         if(repos.length == 0) {
           $('.error').hide();
-          $('#userName').append('<div class="error">check the repos to which you want to add a user</div>').fadeIn();
+          $('#userName').append('<div class="error">check the repos to which you want to add a collaborator</div>').fadeIn();
         } else {
           for(var i=0; i<repos.length; i++) {
             $('.error').hide();
             addCollaborator($('.userName').val(), repos[i].id);
+          };
+        };            
+      }); 
+
+      //search users
+      function userSearch() {
+        $.ajax({
+          url: usersUrl,
+          type: 'GET',
+          data: {q: "location:94110"},
+          success: function(response) {
+            console.log(response);
+            callback(response);
           }
-        }
-      });
+        });
+      };
+
 
     });
   };
-});
+}); 

@@ -13,12 +13,12 @@
 }
 
 .form-inline {
-	margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 .error {
-	color: red;
-	font-size: 20px
+  color: red;
+  font-size: 20px
 }
 .img-responsive {
   height: 34px;
@@ -28,7 +28,16 @@
 }
 
 .signIn {
-  position: absolute;
-  top: 50%;
   margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: auto;
+  width: 40%;
+  text-align: center;
 }
+
+.button-block, .signIn {
+  width: 200px;
+}
+
+
