@@ -1,27 +1,26 @@
-$(document).ready( function () {
+var Connectus = {
 
-  //$('#createRepo, #addUser, #listRepos').hide();
-  //oauth.io authentication
-  OAuth.initialize('vMLd_AIdnpZtRPRH61n9z4j8RS8', {cache: true});
-
-  if(OAuth.create('github')) {
-    console.log(OAuth.create('github'));
+  init : function() {
+    OAuth.initialize('vMLd_AIdnpZtRPRH61n9z4j8RS8', {cache: true});
+    if(OAuth.create('github')) {
+      console.log(OAuth.create('github'));
       $('.signIn').hide();
       $('#createRepo, #addUser, #listRepos').fadeIn();
-      doEverything();
+      this.doEverything();
     } else {
       console.log(OAuth.create('github'));
       $('.signIn').fadeIn();
       $('#createRepo, #addUser, #listRepos').hide();
-      $('.signIn').on('click', doEverything );
-  }
-  
-  function doEverything() {
+      $('.signIn').on('click', this.doEverything );
+    }
+  },
+
+  doEverything : function() {
     OAuth.popup('github', {cache: true}, function(error, result) {
       //handle error with error
       //use result.access_token in your API request
-    $('.signIn').hide();
-    $('#createRepo, #addUser, #listRepos').fadeIn();
+      $('.signIn').hide();
+      $('#createRepo, #addUser, #listRepos').fadeIn();
 
       //urls used in API calls
       var apiUrl = "https://api.github.com";
@@ -33,7 +32,8 @@ $(document).ready( function () {
       //display a string on the page
       function display(object) {
         $('.repos').hide().html(object).fadeIn();
-      }; 
+      };
+
       function countLang(repos) {
 
       };
@@ -123,8 +123,8 @@ $(document).ready( function () {
             $('.error').hide();
             addCollaborator($('.userName').val(), repos[i].id);
           };
-        };            
-      }); 
+        };
+      });
 
       //search users
       function userSearch() {
@@ -139,7 +139,11 @@ $(document).ready( function () {
         });
       };
 
-
     });
-  };
-}); 
+  }
+
+}
+
+$(document).ready( function () {
+  Connectus.init();
+});
