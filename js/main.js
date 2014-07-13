@@ -39,19 +39,29 @@ var Connectus = {
       };
 
       function getLang(repos) {
+        var languages = {};
         for(var i=0;i<repos.length;i++) {
           $.ajax({
             url: repos[i].languages_url+tokenUrl,
             type: 'GET',
             success: function(response) {
-              console.log(response);
               //callback(response);
+              for(var key in response) {
+                if ( languages.hasOwnProperty(key) ) {
+                  languages[key] += response[key];
+                } else {
+                  languages[key] = response[key];
+                }
+              }
+              console.log(languages);
             }
           });
-        };
+        }
+        
       };
 
       getRepo(getLang);
+
 
       //get authenticated repos
       function getRepo(callback) {
